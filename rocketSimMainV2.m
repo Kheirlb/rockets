@@ -5,6 +5,8 @@
 % Used this for help:
 % https://mintoc.de/index.php/Gravity_Turn_Maneuver
 
+clc; clear;
+
 %% Given
 angle = 1; %deg
 Mo = 750; %kg
@@ -27,27 +29,25 @@ CdvsMach = xlsread(fileName, 1, 'A2:C2501');
 %col3 = Density [kg/m^3]
 atmosphereData = xlsread(fileName, 2, 'A3:C1203');
 
-%% Calcs
+%% Pre-Calcs
 tStep = 0.1;%adjust
 tF = 100; %time final adjust
-tTotal = 1:tStep:tF;
+tTotal = 1:tStep:tF; %total time
+
 tPower = 1:tStep:tb;
 tCoast = (tb+tStep):tStep:tF;
 
-mdot = Mp/tb; 
-isp = thrust/(mdot*g);
-ueq = isp*g;
+mdot = Mp/tb; %mass flow rate
+isp = thrust/(mdot*g); %isp
+ueq = isp*g; %ueq
 R = Mo/Mb;
 deltaU = ueq*log(R); 
-count = 1;
-hPower = zeros(1, size(tPower, 2));
+g0 = 9.81;
+y0 = [0 0];
+[ans1, y] = ode45('rocketSimODE', tTotal, y0);
 
-for t = tPower 
-    hPower(count) = -ueq*t*((log(R))/(R-1)) + ueq*t - 0.5*g*(t^2);
-    count = count + 1;
-end
-hB = hPower(tb);
-%plot(tPower, hPower);
+%count = 1;
+%hPower = zeros(1, size(tPower, 2));
 
 %ode: v, h, beta, theta
 
@@ -56,7 +56,7 @@ hB = hPower(tb);
 fprintf("Total Weight %2.0f pounds\n", convmass(Mo,'kg','lbm'));
 fprintf("Thrust: %2.0f pounds\n", convforce(thrust,'N','lbf'));
 fprintf("T/W: %2.3f \n", thrust/(Mo*9.81));
-fprintf("Burnout Altitude: %2.0f meters\n", hB); 
-fprintf("Burnout Altitude: %2.0f feet\n", convlength(hB,'m','ft')); 
+%fprintf("Burnout Altitude: %2.0f meters\n", hB); 
+%fprintf("Burnout Altitude: %2.0f feet\n", convlength(hB,'m','ft')); 
 
 
