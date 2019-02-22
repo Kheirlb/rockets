@@ -9,7 +9,7 @@ R = 6.4*10^6;
 %x0=0;
 %x0=0
 %v0=0;
-tspan=[(0:100)];
+tspan=[1:1:100];
 [T,X]=ode45(@frocket, tspan, [0 0]);
 % disp(T)
 % disp(X)

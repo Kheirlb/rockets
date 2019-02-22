@@ -8,17 +8,21 @@
 clc; clear;
 
 %% Given
-angle = 1; %deg
-Mo = 750; %kg
-Ml = 10;
-Ms = 240;
-Mb = Ml + Ms;
-Mp = Mo - Mb;
-tb = 60; %sec
+beta0 = 1; %deg launch angle
+Mo = 750; %kg total weight
+Ml = 10; %payload mass
+Ms = 240; %strucure mass
+Mb = Ml + Ms; %mass at burnout (structure and payload)
+Mp = Mo - Mb; %mass of propellant
+tb = 60; %sec 
 thrust = 20000; %N
 frontArea = 0.196; %m^2
-g = 9.81;
 
+g0 = 9.81;
+r0 = 6.3781*10^6; %raduis of earth
+theta0 = 0; %angle from launch location
+
+fprintf("Importing Data\n");
 fileName = 'rocketSimExcel.xlsx';
 %col1 = Mach 0.01 increments
 %col2 = Cd Power-off
@@ -37,14 +41,16 @@ tTotal = 1:tStep:tF; %total time
 tPower = 1:tStep:tb;
 tCoast = (tb+tStep):tStep:tF;
 
-mdot = Mp/tb; %mass flow rate
-isp = thrust/(mdot*g); %isp
-ueq = isp*g; %ueq
+m_dot = Mp/tb; %mass flow rate
+isp = thrust/(m_dot*g0); %isp
+ueq = isp*g0; %ueq
 R = Mo/Mb;
 deltaU = ueq*log(R); 
-g0 = 9.81;
+
+%% ode
 y0 = [0 0];
-[ans1, y] = ode45('rocketSimODE', tTotal, y0);
+options = odeset('Events',@yzero);
+%[ans1, y, te, ye, ie] = ode45('rocketSimODE', tPower, y0);
 
 %count = 1;
 %hPower = zeros(1, size(tPower, 2));
