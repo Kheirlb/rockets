@@ -19,16 +19,16 @@ Mb = Ml + Ms; %mass at burnout (structure and payload)
 Mp = Mo - Mb; %mass of propellant
 
 % %Excel Data
-% fprintf("Importing Data\n");
-% fileName = 'rocketSimExcel.xlsx';
-% %col1 = Mach 0.01 increments
-% %col2 = Cd Power-off
-% %col3 = Cd Power-on
-% CdvsMach = xlsread(fileName, 1, 'A2:C2501');
-% %col1 = Altitude [m]
-% %col2 = Temp [K]
-% %col3 = Density [kg/m^3]
-% atmosphereData = xlsread(fileName, 2, 'A3:C1203');
+fprintf("Importing Data\n");
+fileName = 'rocketSimExcel.xlsx';
+%col1 = Mach 0.01 increments
+%col2 = Cd Power-off
+%col3 = Cd Power-on
+CdvsMach = xlsread(fileName, 1, 'A2:C2501');
+%col1 = Altitude [m]
+%col2 = Temp [K]
+%col3 = Density [kg/m^3]
+atmosphereData = xlsread(fileName, 2, 'A3:C1203');
 
 g0 = 9.81;
 r0 = 6.3781*10^6; %raduis of earth
@@ -36,6 +36,7 @@ drag0 = 5000; %tempory value
 beta0 = 1; %deg launch angle
 initialThrust = 20000; %N
 thrust0 = initialThrust;
+temp0 = 288.15; %kelvin
 
 %% Some Initial Calcs
 m_dot = Mp/burntime; %mass flow rate
@@ -49,6 +50,7 @@ tStep = 1;
 tFinal = 300;
 tSpan = 1:tStep:tFinal;
 
+%densityNew = interp1(atmosphereData(:,1),)
 
 %% Iterate 1 Second and Grab Values
 accel_1 = initialThrust/Mo;
@@ -91,6 +93,18 @@ firstPlot(2).YAxis.TickLabelFormat='%.f';
 firstPlot(2).YAxis.Exponent = 0;
 
 maxAltReal = max(x(:,3));
+maxVertVelReal = max(x(:,4));
+maxHorzVelReal = max(x(:,2));
+fprintf('Max Altitude  (Real): %4.1f [m]\n',maxAltReal);
+fprintf('Max Vert Vel  (Real): %4.1f\n',maxVertVelReal);
+fprintf('Max Horz Vel  (Real): %4.1f\n',maxHorzVelReal);
+
 maxAltIdeal = max(x2(:,3));
-fprintf('Max Altitude  (Real): %4.1f\n',maxAltReal);
-fprintf('Max Altitude (Ideal): %4.1f\n',maxAltIdeal);
+maxVertVelIdeal = max(x2(:,4));
+maxHorzVelIdeal = max(x2(:,2));
+fprintf('\nMax Altitude  (Ideal): %4.1f [m]\n',maxAltIdeal);
+fprintf('Max Vert Vel  (Ideal): %4.1f\n',maxVertVelIdeal);
+fprintf('Max Horz Vel  (Ideal): %4.1f\n',maxHorzVelIdeal);
+
+
+

@@ -17,16 +17,11 @@ beta = asind(y0(2)/(sqrt(y0(2)^2 + y0(4)^2)));
 g = g0*((r0/(r0+du(3)))^2);
 
 %drag calulcation
-area_ref = 0.196; %m^2
-rho = 0;
-%rho = f(atl)
 %temp = f(altitude) du(3)?
-%velVec = sqrt(y0(2)^2+y0(4)^2);
-%valueOfMach(velVec, temp);
-%Cd = f(Mach);
-%drag = 0.5*rho*Cd*velVec^2*area_ref;
+velVec = sqrt(y0(2)^2+y0(4)^2);
+valueOfMach(velVec, temp);
 
-fprintf('t: %2.1f   du(3): %2.1f   g: %2.4f   beta: %2.3f   rho: %1.4f\n', t, du(3), g, beta, rho);
+fprintf('t: %2.1f   du(3): %2.1f   g: %2.4f   beta: %2.3f\n', t, du(3), g, beta);
 
 du(2) = (thrust*sind(beta))/m - (drag*sind(beta))/m; %x-velocity
 du(4) = (thrust*cosd(beta))/m - (drag*cosd(beta))/m - g; %y-velocity
