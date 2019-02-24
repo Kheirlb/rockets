@@ -7,11 +7,11 @@
 
 clc; clear;
 
-%% Given
-global Mo g0 drag0 beta0 thrust0 burntime m_dot r0;
+%% Initial
+global Mo g0 drag0 beta0 thrust0 burntime m_dot r0 atmosphereData CdvsMach;
 burntime = 60;
 
-% Mass Stuff
+%% Mass
 Mo = 750; %kg total weight
 Ml = 10; %payload mass
 Ms = 240; %strucure mass
@@ -24,16 +24,15 @@ fileName = 'rocketSimExcel.xlsx';
 %col1 = Mach 0.01 increments
 %col2 = Cd Power-off
 %col3 = Cd Power-on
-CdvsMach = xlsread(fileName, 1, 'A2:C2501');
+CdvsMach = xlsread(fileName, 1, 'A2:C2502');
 %col1 = Altitude [m]
 %col2 = Temp [K]
 %col3 = Density [kg/m^3]
-atmosphereData = xlsread(fileName, 2, 'A3:C1203');
+atmosphereData = xlsread(fileName, 2, 'A3:C1204');
 
-%% Initial Values
+%% More Initial Values
 g0 = 9.81;
 r0 = 6.3781*10^6; %raduis of earth
-drag0 = 5000; %tempory value
 beta0 = 1; %deg launch angle
 initialThrust = 20000; %N
 thrust0 = initialThrust;
@@ -46,12 +45,10 @@ ueq = isp*g0; %ueq
 R = Mo/Mb;
 deltaU = ueq*log(R); 
 
-
+%% Time Adjustments
 tStep = 1;
-tFinal = 300;
-tSpan = 1:tStep:tFinal;
-
-%densityNew = interp1(atmosphereData(:,1),)
+tFinal = 500;
+tSpan = 0:tStep:tFinal;
 
 %% Iterate 1 Second and Grab Values
 accel_1 = initialThrust/Mo;
@@ -64,13 +61,14 @@ z3o=0;  % y-(initial y position)
 z4o=uy_1;  % y-(initial y velocity)
 y=[z1o;z2o;z3o;z4o];
 
+%% Run Numerical Simulation
 options = odeset('Events',@yzero);
 %fprintf("\n------- Real --------\n");
 [t, x, te, ye, ie]=ode45(@rocketSimODE_Real,tSpan,y, options);
 %fprintf("\n------- Ideal --------\n");
-[t2, x2, te2, ye2, ie2]=ode45(@rocketSimODE_Ideal,tSpan,y, options);
+[t2, x2, te2, ye2, ie2]=ode45(@rocketSimODE_Real,tSpan,y, options);
 
-%-- Plots --
+%% Plots
 
 labelIdeal = 'Ideal';
 labelComplex = 'Real';
