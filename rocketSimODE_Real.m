@@ -12,7 +12,7 @@ function [du] = rocketSimODE_Real(t,y)
 %du(4) = y acceleration -> y velocity y(4)
 
 %% Initial Values
-global Mo g0 drag0 beta0 thrust0 r0 frontArea;
+global g0 r0 frontArea;
 alt = y(3);
 du=zeros(4,1);
 
@@ -39,7 +39,7 @@ drag = 0.5*rho*Cd*(velVec^2)*area_ref;
 
 %% Print Statements
 %fprintf('t: %2.1f   du(3): %2.1f   y(3): %2.1f   rho: %2.4f   g: %2.4f   beta: %2.3f   rho: %1.4f\n', t, du(3), y(3), rho, g, beta, rho);
-%fprintf('t: %2.1f  beta: %2.1f  alt: %2.1f  mach: %2.1f  drag: %2.1f\n',t,beta, alt, Mach, drag);
+%fprintf('t: %2.1f  velVec: %2.1f  temp: %2.1f  mach: %2.1f  drag: %2.1f  beta: %2.1f m: %2.1f\n',t,velVec, temp, Mach, drag,  beta, m);
 
 %% Acceleration Changes
 du(2) = (thrust*sind(beta))/m - (drag*sind(beta))/m;     %x-accel

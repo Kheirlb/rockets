@@ -6,7 +6,7 @@
 % https://mintoc.de/index.php/Gravity_Turn_Maneuver
 % https://carlospereyradotus.wordpress.com/independent-projects/drag-simulation/
 
-clc; clear;
+clc; clear; clear all;
 
 %% Initial Variables
 global Mo g0 drag0 beta0 thrust0 burntime m_dot r0 atmosphereData CdvsMach frontArea;
@@ -16,6 +16,7 @@ rocketType = 1;
 % 1 = HW2
 % 2 = FAR/MARS
 % 3 = GAH
+% 4 = HW1
 % otherwise = LR101 Rocket
 
 switch rocketType
@@ -49,6 +50,16 @@ switch rocketType
         Mo = 150; %kg total weight
         Ms = 120; %strucure mass
         Ml = 0; %payload mass
+    case 4
+        %% Initial Values - HW1
+        disp('HW1');
+        beta0 = 1; %deg launch angle
+        thrust0 = 25162; %Newtons
+        burntime = 75; %seconds
+        frontArea = 0.196; %m^2
+        Mo = 1000; %kg total weight
+        Ms = 240; %strucure mass
+        Ml = 85; %payload mass
     otherwise
         %% Initial Values - LR101
         beta0 = 1; %deg launch angle
@@ -59,7 +70,7 @@ switch rocketType
         Ms = 90; %strucure mass
         Ml = 0; %payload mass
 end
-   
+
 %% Propellant/Burnout
 Mb = Ml + Ms; %mass at burnout (structure and payload)
 Mp = Mo - Mb; %mass of propellant
@@ -80,7 +91,6 @@ CdvsMach = xlsread(fileName, 1, 'A2:C2502');
 %col3 = Density [kg/m^3]
 atmosphereData = xlsread(fileName, 2, 'A3:C1204');
 
-
 %% Some Initial Calcs
 m_dot = Mp/burntime; %mass flow rate
 isp = thrust0/(m_dot*g0); %isp
@@ -89,8 +99,8 @@ R = Mo/Mb; %mass ratio
 deltaU = ueq*log(R); %total deltaU
 
 %% Time Adjustments
-tStep = 1;
-tFinal = 500;
+tStep = 0.1;
+tFinal = 600;
 tSpan = 1:tStep:tFinal;
 
 %% Iterate 1 Second and Grab Initial Values
@@ -112,28 +122,107 @@ options = odeset('Events',@yzero);
 %fprintf("\n------- Ideal --------\n");
 [t2, x2, te2, ye2, ie2]=ode45(@rocketSimODE_Ideal,tSpan,y, options);
 
+x_pos = x(:,1);  % x-(x position)
+x_vel = x(:,2);  % x-(x velocity)
+y_pos = x(:,3);  % y-(y position)
+y_vel = x(:,4);  % y-(y velocity)
+
+%% Post Processing Using Solved Position and Velocity Values
+% This section will find Acceleration, Dynamic Pressure, and Mach # vs Time 
+return_t = length(t);
+Mach = zeros(return_t,1);
+Q = zeros(return_t,1);
+AccelFlight = zeros(return_t,1);
+velVecFlight = zeros(return_t,1);
+for i = 1:return_t
+    area_ref = frontArea; %m^2
+    rho = findrho(y_pos(i)); %rho = f(atl)
+    temp = findTemp(y_pos(i));
+    velVecFlight(i) = sqrt(x_vel(i)^2 + y_vel(i)^2);
+    %fprintf('i: %2.1f   rho: %2.1f  temp: %2.1f  velVecFlight(i): %2.1f\n',i,rho,temp,velVecFlight(i));
+    Mach(i) = valueOfMach(velVecFlight(i), temp);
+    Cd = findCd(Mach(i));
+    drag = 0.5*rho*Cd*(velVecFlight(i)^2)*area_ref;
+    beta = asind(x_vel(i)/(sqrt(x_vel(i)^2 + y_vel(i)^2)));
+    g = g0*((r0/(r0+y_pos(i)))^2);
+    m = valueAt(t(i), 'mass'); %kg total weight
+    thrust = valueAt(t(i), 'thrust');
+    x_accel = (thrust*sind(beta))/m - (drag*sind(beta))/m;     %x-accel
+    y_accel = (thrust*cosd(beta))/m - (drag*cosd(beta))/m - g; %y-accel
+    % This last few values have issues so we omit them.
+    if t(i) < te(2) - te(2)/10 
+        Q(i) = 0.5*rho*(velVecFlight(i)^2);
+        AccelFlight(i) = sqrt(x_accel^2 + y_accel^2);
+    else % Simply set to Zero
+        Q(i) = 0;
+        AccelFlight(i) = 0;
+    end
+end
+
 %% Plots
 
-labelIdeal = 'Ideal';
-labelComplex = 'Real';
+labelIdeal = 'Ideal - No Drag';
+labelComplex = 'Real - Drag';
+plotR = 2;
+plotC = 3;
 
-firstPlot = subplot(2,1,1);
-plot(t,x(:,3),'+r',t2,x2(:,3),'k')
-title('Altitude')
+firstPlot = subplot(plotR,plotC,1);
+plot(t,x(:,3),'r',t2,x2(:,3),'k')
+title('Altitude vs Time')
 xlabel('Time [sec]');
 ylabel('Altitude [m]');
 legend(labelComplex,labelIdeal)
 firstPlot.YAxis.TickLabelFormat='%.f';
 firstPlot.YAxis.Exponent = 0;
+grid on
 
-firstPlot(2) = subplot(2,1,2);
-plot(t,x(:,1),'+r',t2,x2(:,1),'k')
-title('Downrange')
+firstPlot(2) = subplot(plotR,plotC,4);
+plot(t,x(:,1),'r',t2,x2(:,1),'k')
+title('Downrange vs Time')
 xlabel('Time [sec]');
 ylabel('Horizontal Distance [m]');
 legend(labelComplex,labelIdeal)
 firstPlot(2).YAxis.TickLabelFormat='%.f';
 firstPlot(2).YAxis.Exponent = 0;
+grid on
+
+firstPlot(3) = subplot(plotR,plotC,2);
+plot(t,velVecFlight,'r',t,x_vel,'b',t,y_vel,'g')
+title('Velocity vs Time')
+xlabel('Time [sec]');
+ylabel('Velocity [m/s]');
+legend('Flight Path','Horizontal','Vertical')
+firstPlot(3).YAxis.TickLabelFormat='%.f';
+firstPlot(3).YAxis.Exponent = 0;
+grid on
+
+firstPlot(4) = subplot(plotR,plotC,5);
+plot(t,AccelFlight,'r')
+title('Acceleration vs Time')
+xlabel('Time [sec]');
+ylabel('Acceleration [m/s^2]');
+%legend('Flight Path')
+firstPlot(4).YAxis.TickLabelFormat='%.f';
+firstPlot(4).YAxis.Exponent = 0;
+grid on
+
+firstPlot(5) = subplot(plotR,plotC,3);
+plot(t,Q,'r')
+title('Dynamic Pressure vs Time')
+xlabel('Time [sec]');
+ylabel('Q [Pa]');
+firstPlot(5).YAxis.TickLabelFormat='%.f';
+firstPlot(5).YAxis.Exponent = 0;
+grid on
+
+firstPlot(6) = subplot(plotR,plotC,6);
+plot(t,Mach,'r')
+title('Mach Number vs Time')
+xlabel('Time [sec]');
+ylabel('Mach');
+firstPlot(6).YAxis.TickLabelFormat='%.f';
+firstPlot(6).YAxis.Exponent = 0;
+grid on
 
 maxAltReal = max(x(:,3));
 maxHorzReal = max(x(:,1));
@@ -154,4 +243,3 @@ fprintf('Max Horz Vel  (Ideal): %4.1f [m/s]\n',maxHorzVelIdeal);
 fprintf("\nTotal Weight: %2.0f  pounds\n", convmass(Mo,'kg','lbm'));
 fprintf("Thrust:       %2.0f pounds\n", convforce(thrust0,'N','lbf'));
 fprintf("T/W:          %2.3f \n", thrust0/(Mo*g0));
-
