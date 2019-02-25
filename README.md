@@ -34,7 +34,9 @@ It is possible to change between different rocket characteristics/specifications
 * Incorporate control systems (TVC)
 * Incorporate staging
 * Incorporate transfer into LEO or GEO orbits
-* Add Graphical User Interface (GUI)
+* Add parachute deployment options
+* Add re-entry information
+* Add graphical user interface (GUI)
 * Make non-MATLAB version for any user (python?)
 * Make GNU Octave Compatible
 
