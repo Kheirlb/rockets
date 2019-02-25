@@ -1,6 +1,15 @@
-function [outputCd] = findCd(inputMach)
-global CdvsMach;
+function [outputCd] = findCd(inputMach, t)
+global CdvsMach burntime;
 col = 2;
+try
+    if t <= burntime
+        col = 3; %3 = power on
+    else
+        col = 2; %2 = power off
+    end
+catch
+    col = 3;
+end
 if inputMach > 25
     outputCd = CdvsMach(2501,col); 
     return;

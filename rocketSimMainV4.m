@@ -1,15 +1,36 @@
 %% Numerical Simulation of a Rocket Flight
 % Author: Karl Parks
+% Class: AE 530, HW2
 % Date: 2.13.19
+% GitHub Repo: https://github.com/Kheirlb/rockets 
+fprintf('Author: Karl Parks');
+fprintf('Class: AE 530, HW2');
+fprintf('Date: 2.13.19');
 
 % Used this for help:
 % https://mintoc.de/index.php/Gravity_Turn_Maneuver
 % https://carlospereyradotus.wordpress.com/independent-projects/drag-simulation/
 
-clc; clear; clear all;
+%% Dependent Functions
+% rocketSimODE_Real
+% rocketSimODE_Ideal
+% valueAt
+% findrho
+% findTemp
+% valueOfMach
+% findCd
+% simpleInterp
+% yzero
+
+clc; clear; clear all; close all;
 
 %% Initial Variables
 global Mo g0 drag0 beta0 thrust0 burntime m_dot r0 atmosphereData CdvsMach frontArea;
+
+%% Time Adjustments
+tStep = 0.1;
+tFinal = 3000;
+tSpan = 1:tStep:tFinal;
 
 %% Choose Initial Conditions
 rocketType = 1;
@@ -17,6 +38,7 @@ rocketType = 1;
 % 2 = FAR/MARS
 % 3 = GAH
 % 4 = HW1
+% 5 = BASE11
 % otherwise = LR101 Rocket
 
 switch rocketType
@@ -33,7 +55,7 @@ switch rocketType
     case 2
         %% Initial Values - FAR/MARS
         disp('FAR/MARS');
-        beta0 = 1; %deg launch angle
+        beta0 = 0.0; %deg launch angle
         thrust0 = 2224; %Newtons
         burntime = 20; %seconds
         frontArea = 0.031; %m^2
@@ -45,10 +67,10 @@ switch rocketType
         disp('GAH');
         beta0 = 1; %deg launch angle
         thrust0 = 4500; %Newtons
-        burntime = 15; %seconds
+        burntime = 60; %seconds
         frontArea = 0.071; %m^2
         Mo = 150; %kg total weight
-        Ms = 120; %strucure mass
+        Ms = 90; %strucure mass
         Ml = 0; %payload mass
     case 4
         %% Initial Values - HW1
@@ -60,6 +82,16 @@ switch rocketType
         Mo = 1000; %kg total weight
         Ms = 240; %strucure mass
         Ml = 85; %payload mass
+    case 5
+        %% Initial Values - BASE11
+        disp('BASE11');
+        beta0 = 0; %deg launch angle
+        thrust0 = 31400; %Newtons
+        burntime = 31; %seconds %31.4
+        frontArea = 0.2; %m^2
+        Mo = 640; %kg total weight %640
+        Ms = 418; %strucure mass
+        Ml = 0; %payload mass
     otherwise
         %% Initial Values - LR101
         beta0 = 1; %deg launch angle
@@ -97,11 +129,6 @@ isp = thrust0/(m_dot*g0); %isp
 ueq = isp*g0; %ueq
 R = Mo/Mb; %mass ratio
 deltaU = ueq*log(R); %total deltaU
-
-%% Time Adjustments
-tStep = 0.1;
-tFinal = 600;
-tSpan = 1:tStep:tFinal;
 
 %% Iterate 1 Second and Grab Initial Values
 accel_y = (thrust0*cosd(beta0)-Mo*g0)/Mo;
@@ -166,6 +193,15 @@ labelComplex = 'Real - Drag';
 plotR = 2;
 plotC = 3;
 
+maxAltReal = max(x(:,3));
+maxHorzReal = max(x(:,1));
+maxVertVelReal = max(x(:,4));
+maxHorzVelReal = max(x(:,2));
+
+burnoutIndex = find(t == burntime);
+maxAltIndex = find(y_pos == maxAltReal);
+tIb = t(burnoutIndex);
+
 firstPlot = subplot(plotR,plotC,1);
 plot(t,x(:,3),'r',t2,x2(:,3),'k')
 title('Altitude vs Time')
@@ -174,6 +210,10 @@ ylabel('Altitude [m]');
 legend(labelComplex,labelIdeal)
 firstPlot.YAxis.TickLabelFormat='%.f';
 firstPlot.YAxis.Exponent = 0;
+y1 = get(firstPlot,'ylim');
+hold on
+plot([tIb tIb],y1, '--m')
+legend(labelComplex,labelIdeal,'Burnout')
 grid on
 
 firstPlot(2) = subplot(plotR,plotC,4);
@@ -181,9 +221,12 @@ plot(t,x(:,1),'r',t2,x2(:,1),'k')
 title('Downrange vs Time')
 xlabel('Time [sec]');
 ylabel('Horizontal Distance [m]');
-legend(labelComplex,labelIdeal)
 firstPlot(2).YAxis.TickLabelFormat='%.f';
 firstPlot(2).YAxis.Exponent = 0;
+y1 = get(firstPlot(2),'ylim');
+hold on
+plot([tIb tIb],y1, '--m')
+legend(labelComplex,labelIdeal,'Burnout')
 grid on
 
 firstPlot(3) = subplot(plotR,plotC,2);
@@ -194,6 +237,10 @@ ylabel('Velocity [m/s]');
 legend('Flight Path','Horizontal','Vertical')
 firstPlot(3).YAxis.TickLabelFormat='%.f';
 firstPlot(3).YAxis.Exponent = 0;
+y1 = get(firstPlot(3),'ylim');
+hold on
+plot([tIb tIb],y1, '--m')
+legend('Flight Path','Horizontal','Vertical','Burnout')
 grid on
 
 firstPlot(4) = subplot(plotR,plotC,5);
@@ -204,6 +251,10 @@ ylabel('Acceleration [m/s^2]');
 %legend('Flight Path')
 firstPlot(4).YAxis.TickLabelFormat='%.f';
 firstPlot(4).YAxis.Exponent = 0;
+y1 = get(firstPlot(4),'ylim');
+hold on
+plot([tIb tIb],y1, '--m')
+legend('Flight Path','Burnout')
 grid on
 
 firstPlot(5) = subplot(plotR,plotC,3);
@@ -213,6 +264,10 @@ xlabel('Time [sec]');
 ylabel('Q [Pa]');
 firstPlot(5).YAxis.TickLabelFormat='%.f';
 firstPlot(5).YAxis.Exponent = 0;
+y1 = get(firstPlot(5),'ylim');
+hold on
+plot([tIb tIb],y1, '--m')
+legend('Q','Burnout')
 grid on
 
 firstPlot(6) = subplot(plotR,plotC,6);
@@ -222,24 +277,42 @@ xlabel('Time [sec]');
 ylabel('Mach');
 firstPlot(6).YAxis.TickLabelFormat='%.f';
 firstPlot(6).YAxis.Exponent = 0;
+y1 = get(firstPlot(6),'ylim');
+hold on
+plot([tIb tIb],y1, '--m')
+legend('Mach','Burnout')
 grid on
 
-maxAltReal = max(x(:,3));
-maxHorzReal = max(x(:,1));
-maxVertVelReal = max(x(:,4));
-maxHorzVelReal = max(x(:,2));
-fprintf('\nMax Altitude  (Real): %4.1f [m] %4.1f [ft]\n',maxAltReal,convlength(maxAltReal,'m','ft'));
+fprintf('\nf. ');
+fprintf('\nBurnout Time  (Real): %4.1f [sec]\n',t(burnoutIndex)); 
+fprintf('Burnout Alt   (Real): %4.1f [m] %4.1f [ft]\n',y_pos(burnoutIndex),convlength(y_pos(burnoutIndex),'m','ft'));
+fprintf('Burnout Vel   (Real): %4.1f [m/s]\n',velVecFlight(burnoutIndex));
+
+fprintf('\ng. ');
+fprintf('\nTime @ Apogee (Real): %4.1f [sec]\n',t(maxAltIndex)); 
+fprintf('Apogee Alt    (Real): %4.1f [m] %4.1f [ft]\n',maxAltReal,convlength(maxAltReal,'m','ft'));
+
+fprintf('\nh. ');
+fprintf('\nTime @ Impact (Real): %4.1f [sec]\n',te(2)); 
 fprintf('Max Horiz     (Real): %4.1f [m] %4.1f [ft]\n',maxHorzReal,convlength(maxHorzReal,'m','ft'));
-fprintf('Max Vert Vel  (Real): %4.1f [m/s]\n',maxVertVelReal);
+
+fprintf('\nl. ');
+fprintf('\nMATLAB''s ode45 numerical integrator chooses its own time step.\n');
+fprintf('https://www.mathworks.com/help/matlab/ref/ode45.html#bu00_4l_sep_shared-tspan\n');
+
+fprintf('\nOther Interesting Information');
+fprintf('\nMax Vert Vel  (Real): %4.1f [m/s]\n',maxVertVelReal);
 fprintf('Max Horz Vel  (Real): %4.1f [m/s]\n',maxHorzVelReal);
+fprintf('Max Velocity  (Real): %4.1f [m/s]\n',max(velVecFlight(1:maxAltIndex)));
 
 maxAltIdeal = max(x2(:,3));
 maxVertVelIdeal = max(x2(:,4));
 maxHorzVelIdeal = max(x2(:,2));
 fprintf('\nMax Altitude  (Ideal): %4.1f [m]\n',maxAltIdeal);
-fprintf('Max Vert Vel  (Ideal): %4.1f [m/s]\n',maxVertVelIdeal);
-fprintf('Max Horz Vel  (Ideal): %4.1f [m/s]\n',maxHorzVelIdeal);
+%fprintf('Max Vert Vel  (Ideal): %4.1f [m/s]\n',maxVertVelIdeal);
+%fprintf('Max Horz Vel  (Ideal): %4.1f [m/s]\n',maxHorzVelIdeal);
 
 fprintf("\nTotal Weight: %2.0f  pounds\n", convmass(Mo,'kg','lbm'));
 fprintf("Thrust:       %2.0f pounds\n", convforce(thrust0,'N','lbf'));
 fprintf("T/W:          %2.3f \n", thrust0/(Mo*g0));
+

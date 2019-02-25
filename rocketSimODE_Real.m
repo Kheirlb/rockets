@@ -33,8 +33,8 @@ rho = findrho(alt); %rho = f(atl)
 temp = findTemp(alt);
 velVec = sqrt(y(2)^2 + y(4)^2);
 Mach = valueOfMach(velVec, temp);
-Cd = findCd(Mach);
-drag = 0.5*rho*Cd*(velVec^2)*area_ref;
+Cd = findCd(Mach, t);
+drag = 0.5*rho*Cd*(velVec*abs(velVec))*area_ref;
 %drag = 0;
 
 %% Print Statements
