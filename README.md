@@ -31,8 +31,13 @@ It is possible to change between different rocket characteristics/specifications
 * Incorporate CG vs CP differences
 * Incorporate lift of rocket and fins
 * Incorporate thrust profiles (with changing back pressure)  
-* Incorporate control systems
+* Incorporate control systems (TVC)
+* Incorporate staging
+* Incorporate transfer into LEO or GEO orbits
+* Add Graphical User Interface (GUI)
+* Make non-MATLAB version for any user (python?)
+* Make GNU Octave Compatible
 
-* Apply optimization theory
+* Apply optimization control theory
 
 ## FYI... you could do the above... or you could just use RASAero
