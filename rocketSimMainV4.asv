@@ -1,14 +1,11 @@
-%% Numerical Simulation of a Sounding Rocket Flight
+%% Numerical Simulation of a Rocket Flight
 % Author: Karl Parks
-% Class: AE 530
+% Class: AE 530, HW2
 % Date: 2.13.19
 % GitHub Repo: https://github.com/Kheirlb/rockets 
-clc; clear; clear all; close all;
-
-fprintf('\n --- Numerical Simulation of a Sounding Rocket Flight ---\n\n');
-fprintf('Author: Karl Parks\n');
-fprintf('Class: AE 530\n');
-fprintf('Date: 2.13.19\n\n');
+fprintf('Author: Karl Parks');
+fprintf('Class: AE 530, HW2');
+fprintf('Date: 2.13.19');
 
 % Used this for help:
 % https://mintoc.de/index.php/Gravity_Turn_Maneuver
@@ -28,6 +25,8 @@ fprintf('Date: 2.13.19\n\n');
 % All the above functions can be found on the github repository.
 % https://github.com/Kheirlb/rockets 
 
+clc; clear; clear all; close all;
+
 %% Initial Variables
 global Mo g0 drag0 beta0 thrust0 burntime m_dot r0 atmosphereData CdvsMach frontArea;
 
@@ -38,7 +37,6 @@ tSpan = 1:tStep:tFinal;
 
 %% Choose Initial Conditions
 rocketType = 1;
-%rocketName = '';
 % 1 = HW2
 % 2 = FAR/MARS
 % 3 = GAH
@@ -49,8 +47,7 @@ rocketType = 1;
 switch rocketType
     case 1
         %% Initial Values - HW2
-        fprintf('rocketType: HW2\n');
-        rocketName = 'HW2';
+        fprintf('rocketType: HW2');
         beta0 = 1; %deg launch angle
         thrust0 = 20000; %Newtons
         burntime = 60; %seconds
@@ -60,8 +57,7 @@ switch rocketType
         Ml = 10; %payload mass
     case 2
         %% Initial Values - FAR/MARS
-        fprintf('rocketType: FAR/MARS\n');
-        rocketName = 'FAR/MARS';
+        fprintf('rocketType: HW2');
         beta0 = 0.0; %deg launch angle
         thrust0 = 2224; %Newtons
         burntime = 20; %seconds
@@ -71,8 +67,7 @@ switch rocketType
         Ml = 0; %payload mass
     case 3
         %% Initial Values - GAH
-        fprintf('rocketType: GAH\n');
-        rocketName = 'GAH';
+        fprintf('rocketType: HW2');
         beta0 = 1; %deg launch angle
         thrust0 = 4500; %Newtons
         burntime = 60; %seconds
@@ -82,8 +77,7 @@ switch rocketType
         Ml = 0; %payload mass
     case 4
         %% Initial Values - HW1
-        fprintf('rocketType: HW1\n');
-        rocketName = 'HW1';
+        fprintf('rocketType: HW2');
         beta0 = 1; %deg launch angle
         thrust0 = 25162; %Newtons
         burntime = 75; %seconds
@@ -93,8 +87,7 @@ switch rocketType
         Ml = 85; %payload mass
     case 5
         %% Initial Values - BASE11
-        fprintf('rocketType: BASE11\n');
-        rocketName = 'BASE11';
+        fprintf('rocketType: HW2');
         beta0 = 0; %deg launch angle
         thrust0 = 31400; %Newtons
         burntime = 31; %seconds %31.4
@@ -104,8 +97,7 @@ switch rocketType
         Ml = 0; %payload mass
     otherwise
         %% Initial Values - LR101
-        fprintf('rocketType: LR101?\n');
-        rocketName = 'LR101?';
+        fprintf('rocketType: LR101?');
         beta0 = 1; %deg launch angle
         thrust0 = 4500; %Newtons
         burntime = 15; %seconds
@@ -124,7 +116,7 @@ g0 = 9.81;
 r0 = 6.3781*10^6; %raduis of earth
 
 %% Excel Data
-fprintf("Importing Data: This may take a moment...\n");
+fprintf("Importing Data\n");
 fileName = 'rocketSimExcel.xlsx';
 %col1 = Mach 0.01 increments
 %col2 = Cd Power-off
@@ -173,8 +165,6 @@ Mach = zeros(return_t,1);
 Q = zeros(return_t,1);
 AccelFlight = zeros(return_t,1);
 velVecFlight = zeros(return_t,1);
-fprintf('\nNOTICE: Holding some values constant on plots after t: %4.1f\n', te(2) - te(2)/10);
-
 for i = 1:return_t
     area_ref = frontArea; %m^2
     rho = findrho(y_pos(i)); %rho = f(atl)
@@ -194,13 +184,9 @@ for i = 1:return_t
     if t(i) < te(2) - te(2)/10 
         Q(i) = 0.5*rho*(velVecFlight(i)^2);
         AccelFlight(i) = sqrt(x_accel^2 + y_accel^2);
-        tempIndex = i;
     else % Simply set to Zero
-        velVecFlight(i) = velVecFlight(tempIndex);
-        y_vel(i) = y_vel(tempIndex);
-        Q(i) = Q(tempIndex);
-        AccelFlight(i) = AccelFlight(tempIndex);
-        Mach(i) = Mach(tempIndex);
+        Q(i) = 0;
+        AccelFlight(i) = 0;
     end
 end
 
@@ -236,7 +222,7 @@ grid on
 
 firstPlot(2) = subplot(plotR,plotC,4);
 plot(t,x(:,1),'r',t2,x2(:,1),'k')
-title('Downrange Distance vs Time')
+title('Downrange vs Time')
 xlabel('Time [sec]');
 ylabel('Horizontal Distance [m]');
 firstPlot(2).YAxis.TickLabelFormat='%.f';
@@ -300,9 +286,6 @@ hold on
 plot([tIb tIb],y1, '--m')
 legend('Mach','Burnout')
 grid on
-
-%sgtitle(strcat('Plots for ',rocketName)); %only works on R2018b
-fprintf('\nPlots Displayed\n');
 
 fprintf('\nf. ');
 fprintf('\nBurnout Time  (Real): %4.1f [sec]\n',t(burnoutIndex)); 
