@@ -4,6 +4,8 @@
 * Class: AE 530
 * Date: 2.13.19
 
+![Screenshot](karl_hw2_6plots_v5.jpg?raw=true)
+
 ## Run Program
 
 Run "rocketSimMainV4.m"
