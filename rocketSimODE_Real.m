@@ -1,6 +1,5 @@
 function [du] = rocketSimODE_Real(t,y)
 % -> means "integrates or relates to"
-
 %y(1) = x position
 %y(2) = x velocity
 %y(3) = y position
@@ -15,7 +14,6 @@ function [du] = rocketSimODE_Real(t,y)
 global g0 r0 frontArea;
 alt = y(3);
 du=zeros(4,1);
-
 du(1) = y(2); %x velocity -> x position y(1)
 du(3) = y(4); %y velocity -> y position y(3)
 
@@ -38,12 +36,9 @@ drag = 0.5*rho*Cd*(velVec*abs(velVec))*area_ref;
 %drag = 0;
 
 %% Print Statements
-%fprintf('t: %2.1f   du(3): %2.1f   y(3): %2.1f   rho: %2.4f   g: %2.4f   beta: %2.3f   rho: %1.4f\n', t, du(3), y(3), rho, g, beta, rho);
 %fprintf('t: %2.1f  velVec: %2.1f  temp: %2.1f  mach: %2.1f  drag: %2.1f  beta: %2.1f m: %2.1f\n',t,velVec, temp, Mach, drag,  beta, m);
 
-%% Acceleration Changes
+%% Acceleration Changes - Velocity Propogation
 du(2) = (thrust*sind(beta))/m - (drag*sind(beta))/m;     %x-accel
 du(4) = (thrust*cosd(beta))/m - (drag*cosd(beta))/m - g; %y-accel
-
 end
-

@@ -195,7 +195,7 @@ for i = 1:return_t
         Q(i) = 0.5*rho*(velVecFlight(i)^2);
         AccelFlight(i) = sqrt(x_accel^2 + y_accel^2);
         tempIndex = i;
-    else % Simply set to Zero
+    else % Simply set a flat line near flight completion
         velVecFlight(i) = velVecFlight(tempIndex);
         y_vel(i) = y_vel(tempIndex);
         Q(i) = Q(tempIndex);
