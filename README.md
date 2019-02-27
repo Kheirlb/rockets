@@ -13,15 +13,16 @@ Run "rocketSimMainV4.m"
 It is possible to change between different rocket characteristics/specifications easily using the rocketType variable at the top of the main script. Use a value of 1 for Homework 2 specifications.
 
 ### Dependent Files
-* rocketSimODE_Real
-* rocketSimODE_Ideal
-* valueAt
-* findrho
-* findTemp
-* valueOfMach
-* findCd
-* simpleInterp
-* yzero
+* rocketSimODE_Real.m
+* rocketSimODE_Ideal.m
+* valueAt.m
+* findrho.m
+* findTemp.m
+* valueOfMach.m
+* findCd.m
+* simpleInterp.m
+* yzero.m
+* rocketSimExcel.xlsx
 
 ### Example Input
 ```
