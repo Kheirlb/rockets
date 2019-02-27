@@ -37,13 +37,14 @@ tFinal = 3000;
 tSpan = 1:tStep:tFinal;
 
 %% Choose Initial Conditions
-rocketType = 1;
+rocketType = 2;
 %rocketName = '';
 % 1 = HW2
 % 2 = FAR/MARS
 % 3 = GAH
 % 4 = HW1
 % 5 = BASE11
+% 6 = COMPARISON_1
 % otherwise = LR101 Rocket
 
 switch rocketType
@@ -66,7 +67,7 @@ switch rocketType
         thrust0 = 2224; %Newtons
         burntime = 20; %seconds
         frontArea = 0.031; %m^2
-        Mo = 75; %kg total weight
+        Mo = 75-3.5; %kg total weight
         Ms = 45; %strucure mass
         Ml = 0; %payload mass
     case 3
@@ -102,6 +103,17 @@ switch rocketType
         Mo = 640; %kg total weight %640
         Ms = 418; %strucure mass
         Ml = 0; %payload mass
+    case 6
+        %% Initial Values - COMPARISON_1
+        fprintf('rocketType: COMPARISON_1\n');
+        rocketName = 'COMPARISON_1';
+        beta0 = 2; %deg launch angle
+        thrust0 = 2668.93; %Newtons
+        burntime = 25; %seconds 
+        frontArea = 0.032423161; %m^2
+        Mo = 15.51286 + 28.4856 + 1.81437; %total mass
+        Ms = 28.4856; %strucure mass
+        Ml = 1.81437; %payload mass
     otherwise
         %% Initial Values - LR101
         fprintf('rocketType: LR101?\n');
