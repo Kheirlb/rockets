@@ -210,6 +210,7 @@ for i = 1:return_t
     else % Simply set a flat line near flight completion
         velVecFlight(i) = velVecFlight(tempIndex);
         y_vel(i) = y_vel(tempIndex);
+        x_vel(i) = x_vel(tempIndex);
         Q(i) = Q(tempIndex);
         AccelFlight(i) = AccelFlight(tempIndex);
         Mach(i) = Mach(tempIndex);
@@ -223,10 +224,10 @@ labelComplex = 'Real - Drag';
 plotR = 2;
 plotC = 3;
 
-maxAltReal = max(x(:,3));
-maxHorzReal = max(x(:,1));
-maxVertVelReal = max(x(:,4));
-maxHorzVelReal = max(x(:,2));
+maxAltReal = max(y_pos);
+maxHorzReal = max(x_pos);
+maxVertVelReal = max(y_vel);
+maxHorzVelReal = max(x_vel);
 
 burnoutIndex = find(t == burntime);
 maxAltIndex = find(y_pos == maxAltReal);

@@ -23,6 +23,7 @@ thrust = valueAt(t, 'thrust');
 
 %% Angle and Gravity Change 
 %beta = asind(y(2)/(sqrt(y(2)^2 + y(4)^2)));
+
 beta = atand(y(2)/y(4));
 g = g0*((r0/(r0+y(3)))^2);
 

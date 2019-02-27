@@ -4,7 +4,7 @@
 * Class: AE 530
 * Date: 2.13.19
 
-![Screenshot](karl_hw2_6plots_v5.jpg?raw=true)
+![Screenshot](karl_hw2_6plots_v6.jpg?raw=true)
 
 ## Run Program
 
@@ -66,46 +66,46 @@ Author: Karl Parks
 Class: AE 530
 Date: 2.13.19
 
-rocketType: FAR/MARS
+rocketType: HW2
 Importing Data: This may take a moment...
 
-NOTICE: Holding some values constant on plots after t: 83.1
+NOTICE: Holding some values constant on plots after t: 355.2
 
 Plots Displayed
 
 f.
-Burnout Time  (Real): 20.0 [sec]
-Burnout Alt   (Real): 4542.6 [m] 14903.4 [ft]
-Burnout Vel   (Real): 411.6 [m/s]
+Burnout Time  (Real): 60.0 [sec]
+Burnout Alt   (Real): 35273.8 [m] 115727.5 [ft]
+Burnout Vel   (Real): 1565.3 [m/s]
 
 g.
-Time @ Apogee (Real): 52.6 [sec]
-Apogee Alt    (Real): 10151.9 [m] 33306.8 [ft]
+Time @ Apogee (Real): 218.1 [sec]
+Apogee Alt    (Real): 153031.6 [m] 502072.3 [ft]
 
 h.
-Time @ Impact (Real): 92.4 [sec]
-Max Horiz     (Real):  0.0 [m]  0.0 [ft]
+Time @ Impact (Real): 394.7 [sec]
+Max Horiz     (Real): 142225.7 [m] 466619.9 [ft]
 
 l.
 MATLAB's ode45 numerical integrator chooses its own time step.
 https://www.mathworks.com/help/matlab/ref/ode45.html#bu00_4l_sep_shared-tspan
 
 --- Other Interesting Information ---
-Total Weight: 158 pounds
-Thrust:       500 pounds
-T/W:          3.171
-Isp:          171.1 [sec]
-u_eqivalent:  1678.5 [m/s]
-Mass Ratio:   2
-Delta V:      777.2 [m/s]
+Total Weight: 1653 pounds
+Thrust:       4496 pounds
+T/W:          2.718
+Isp:          244.6 [sec]
+u_eqivalent:  2400.0 [m/s]
+Mass Ratio:   3
+Delta V:      2636.7 [m/s]
 
-Max Alt  (Real): 10151.9 [m] 33306.8 [ft]
-Max Alt    (Eq): 22417.3 [m] 73547.5 [ft]
-Max Alt (Ideal): 21258.8 [m] 69746.6 [ft]
+Max Alt  (Real): 153031.6 [m] 502072.3 [ft]
+Max Alt    (Eq): 261033.4 [m] 856408.7 [ft]
+Max Alt (Ideal): 283222.9 [m] 929209.0 [ft]
 
-Max Vert Vel  (Real): 411.6 [m/s]
-Max Horz Vel  (Real):  0.0 [m/s]
-Max Velocity  (Real): 411.6 [m/s]
+Max Vert Vel  (Real): 1514.4 [m/s]
+Max Horz Vel  (Real): 1040.1 [m/s]
+Max Velocity  (Real): 1566.8 [m/s]
 ```
 ## Future Improvements
 * Improved atmospheric data using atmosisa
