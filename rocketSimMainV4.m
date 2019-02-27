@@ -37,7 +37,7 @@ tFinal = 3000;
 tSpan = 1:tStep:tFinal;
 
 %% Choose Initial Conditions
-rocketType = 2;
+rocketType = 1;
 %rocketName = '';
 % 1 = HW2
 % 2 = FAR/MARS
