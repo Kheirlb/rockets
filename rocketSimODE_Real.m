@@ -35,12 +35,12 @@ velVec = sqrt(y(2)^2 + y(4)^2);
 Mach = valueOfMach(velVec, temp);
 Cd = findCd(Mach, t);
 drag = 0.5*rho*Cd*(velVec*abs(velVec))*area_ref;
-%drag = 0;
+dragX = abs(drag);
 
 %% Print Statements
 %fprintf('t: %2.1f  velVec: %2.1f  temp: %2.1f  mach: %2.1f  drag: %2.1f  beta: %2.1f m: %2.1f\n',t,velVec, temp, Mach, drag,  beta, m);
 
 %% Acceleration Changes - Velocity Propogation
-du(2) = (thrust*sind(beta))/m - (drag*sind(beta))/m;     %x-accel
+du(2) = (thrust*sind(beta))/m - (dragX*sind(beta))/m;     %x-accel
 du(4) = (thrust*cosd(beta))/m - (drag*cosd(beta))/m - g; %y-accel
 end

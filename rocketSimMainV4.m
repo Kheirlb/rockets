@@ -31,11 +31,6 @@ fprintf('Date: 2.13.19\n\n');
 %% Initial Variables
 global Mo g0 drag0 beta0 thrust0 burntime m_dot r0 atmosphereData CdvsMach frontArea;
 
-%% Time Adjustments
-tStep = 0.1;
-tFinal = 3000;
-tSpan = 1:tStep:tFinal;
-
 %% Choose Initial Conditions
 rocketType = 1;
 %rocketName = '';
@@ -47,12 +42,14 @@ rocketType = 1;
 % 6 = COMPARISON_1
 % otherwise = LR101 Rocket
 
+railLength = 18.288; %18.288 m = 60 feet
+
 switch rocketType
     case 1
         %% Initial Values - HW2
         fprintf('rocketType: HW2\n');
         rocketName = 'HW2';
-        beta0 = 1; %deg launch angle
+        beta0 = 0; %deg launch angle
         thrust0 = 20000; %Newtons
         burntime = 60; %seconds
         frontArea = 0.196; %m^2
@@ -96,7 +93,7 @@ switch rocketType
         %% Initial Values - BASE11
         fprintf('rocketType: BASE11\n');
         rocketName = 'BASE11';
-        beta0 = 0; %deg launch angle
+        beta0 = 1; %deg launch angle
         thrust0 = 31400; %Newtons
         burntime = 31; %seconds %31.4
         frontArea = 0.2; %m^2
@@ -132,8 +129,8 @@ Mb = Ml + Ms; %mass at burnout (structure and payload)
 Mp = Mo - Mb; %mass of propellant
 
 %% Earth Values
-g0 = 9.81;
-r0 = 6.3781*10^6; %raduis of earth
+g0 = 9.81; %[m/s2]
+r0 = 6.371*10^6; %raduis of earth [m]
 
 %% Excel Data
 fprintf("Importing Data: This may take a moment...\n");
@@ -154,11 +151,18 @@ ueq = isp*g0; %ueq
 R = Mo/Mb; %mass ratio
 deltaU = ueq*log(R); %total deltaU
 
-%% Iterate 1 Second and Grab Initial Values
-accel_y = (thrust0*cosd(beta0)-Mo*g0)/Mo;
+%% Grab Initial Values & Time Adjustments
+%accel_y = (thrust0*cosd(beta0))/Mo - g0;
+accel_y = (thrust0*cosd(beta0) - Mo*g0)/Mo;
 accel_x = (thrust0*sind(beta0))/Mo;
-uy_1 = accel_y;
-ux_1 = accel_x;
+tFirstStep = sqrt((2*railLength)/accel_y);
+
+tStep = 0.1;
+tFinal = 2000;
+tSpan = tFirstStep:tStep:tFinal;
+
+ux_1 = accel_x*tFirstStep;
+uy_1 = accel_y*tFirstStep;
 
 z1o=0;     % x-(initial x position)
 z2o=ux_1;  % x-(initial x velocity)
@@ -185,7 +189,8 @@ Mach = zeros(return_t,1);
 Q = zeros(return_t,1);
 AccelFlight = zeros(return_t,1);
 velVecFlight = zeros(return_t,1);
-fprintf('\nNOTICE: Holding some values constant on plots after t: %4.1f\n', te(2) - te(2)/10);
+plotHold = te(2)/10;
+fprintf('\nNOTICE: Holding some values constant on plots after t: %4.1f\n', te(2) - plotHold);
 
 for i = 1:return_t
     area_ref = frontArea; %m^2
@@ -203,7 +208,7 @@ for i = 1:return_t
     x_accel = (thrust*sind(beta))/m - (drag*sind(beta))/m;     %x-accel
     y_accel = (thrust*cosd(beta))/m - (drag*cosd(beta))/m - g; %y-accel
     % This last few values have issues so we omit them.
-    if t(i) < te(2) - te(2)/10 
+    if t(i) < te(2) - plotHold
         Q(i) = 0.5*rho*(velVecFlight(i)^2);
         AccelFlight(i) = sqrt(x_accel^2 + y_accel^2);
         tempIndex = i;
@@ -224,14 +229,15 @@ labelComplex = 'Real - Drag';
 plotR = 2;
 plotC = 3;
 
-maxAltReal = max(y_pos);
+[maxAltReal,maxAltIndex] = max(y_pos);
 maxHorzReal = max(x_pos);
 maxVertVelReal = max(y_vel);
 maxHorzVelReal = max(x_vel);
 
-burnoutIndex = find(t == burntime);
-maxAltIndex = find(y_pos == maxAltReal);
-tIb = t(burnoutIndex);
+%burnoutIndex = find(t == burntime);
+%tIb = t(burnoutIndex); %time index at burnout
+burnoutIndex = find(abs(t - burntime) < 1.0);
+tIb = t(burnoutIndex); %time index at burnout
 
 firstPlot = subplot(plotR,plotC,1);
 plot(t,x(:,3),'r',t2,x2(:,3),'k')
@@ -355,6 +361,7 @@ fprintf('Max Alt (Ideal): %4.1f [m] %4.1f [ft]\n',maxAltIdeal,convlength(maxAltI
 fprintf('\nMax Vert Vel  (Real): %4.1f [m/s]\n',maxVertVelReal);
 fprintf('Max Horz Vel  (Real): %4.1f [m/s]\n',maxHorzVelReal);
 fprintf('Max Velocity  (Real): %4.1f [m/s]\n',max(velVecFlight(1:maxAltIndex)));
+fprintf('Max Velocity (Ideal): %4.1f [m/s]\n',sqrt(maxVertVelIdeal^2 + maxHorzVelIdeal^2));
 %fprintf('Max Vert Vel  (Ideal): %4.1f [m/s]\n',maxVertVelIdeal);
 %fprintf('Max Horz Vel  (Ideal): %4.1f [m/s]\n',maxHorzVelIdeal);
 
